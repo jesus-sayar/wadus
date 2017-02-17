@@ -1,5 +1,4 @@
 import boto3
-import botocore
 from terminaltables import AsciiTable
 
 class AwsInstances:

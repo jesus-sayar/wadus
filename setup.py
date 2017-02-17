@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='wadus',
-      version='0.2',
+      version='0.3',
       description='Cloud basic tool',
       keywords='wadus DevOps sysadmin cloud aws',
       url='http://github.com/jesus-sayar/wadus',
