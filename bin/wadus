@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from sys import exit,argv
+import getopt
 from wadus import AwsInstances
 from wadus import AwsAmis
 from wadus import AwsBalancers
+from wadus import OutputWriter
 
 help_text = '''NAME
     wadus - A Cloud basic tool
@@ -13,6 +15,11 @@ SYNOPSYS
 DESCRIPTION
     wadus is a cloud basic tool. The default region is eu-west-1,
     you can change the region using the AWS_DEFAULT_REGION environment variable.
+OPTIONS
+    -t output_type
+        Decide how to output the results. Valid options 'csv', 'table' (Default)
+    -f output_filename
+        File in which to dump the results in case csv output type is selected. Default value 'output'
 PARAMETERS
     instances
         list all running instances
@@ -29,19 +36,33 @@ COPYRIGHT
     NO WARRANTY, to the extent permitted by law.
 '''
 
-if len(argv) <= 2 or argv[1] == 'help':
+
+opts, args = getopt.getopt(argv[1:],"f:t:", ['filename=','type='])
+
+filename ='output'
+output_type=''
+
+for option, arg in opts:
+    if option in ('-f', '--filename'):
+        filename = arg
+    if option in ('-t', '--type'):
+        output_type = arg
+
+output_writer = OutputWriter( output_type=output_type ,filename=filename)
+
+if len(args) <= 1 or args[0] == 'help':
     print(help_text)
     exit(0)
 
-if len(argv) == 3 and argv[1] == 'aws':
-    if argv[2] == 'instances':
-        aws_instances = AwsInstances()
+if len(args) == 2 and args[0] == 'aws':
+    if args[1] == 'instances':
+        aws_instances = AwsInstances(output_writer)
         aws_instances.list()
-    elif argv[2] == 'amis':
-        aws_amis = AwsAmis()
+    elif args[1] == 'amis':
+        aws_amis = AwsAmis(output_writer)
         aws_amis.list()
-    elif argv[2] == 'elbs':
-        aws_balancers = AwsBalancers()
+    elif args[1] == 'elbs':
+        aws_balancers = AwsBalancers(output_writer)
         aws_balancers.list()
     else:
         print(help_text)

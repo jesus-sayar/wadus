@@ -1,17 +1,16 @@
 import boto3
-from terminaltables import AsciiTable
 
 class AwsInstances:
-    def __init__(self):
+    def __init__(self, writer):
         self.ec2 = boto3.resource('ec2')
+        self.writer = writer
 
     def list(self):
         filters = [{'Name': 'instance-state-name', 'Values': ['running']}]
         instances = self.ec2.instances.filter(Filters=filters)
-        self.print_table(instances)
 
-    def print_table(self, instances):
-        table_data = [['Name', 'ID', 'Type', 'Public IP', 'Private IP', 'Zone', 'Roles', 'Stages']]
+        table_headers = ['Name', 'ID', 'Type', 'Public IP', 'Private IP', 'Zone', 'Roles', 'Stages']
+        table_data = []
         for i in instances:
             if i.tags:
                 tags = dict(map((lambda x: [x['Key'],x['Value']]),i.tags))
@@ -23,5 +22,6 @@ class AwsInstances:
                                   i.placement['AvailabilityZone'],
                                   tags.get('Roles'),
                                   tags.get('Stages')])
-        table = AsciiTable(table_data)
-        print(table.table)
+
+
+        self.writer.write(table_headers, table_data)
